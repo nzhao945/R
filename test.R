@@ -10,3 +10,4 @@
 library(data.table)
 mtcars_dt <- data.table(mtcars)
 mtcars_dt[1:10]
+temp <- mtcars_dt[1:10]
