@@ -11,3 +11,5 @@ library(data.table)
 mtcars_dt <- data.table(mtcars)
 mtcars_dt[1:10]
 temp <- mtcars_dt[1:10]
+tmp <- copy(temp)
+dt <- data.table(x=rep(c("a","b","c"),times=3),y=1:9,stringsAsFactors = F)
