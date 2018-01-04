@@ -15,6 +15,7 @@ ggplot()+
   geom_point(aes(x = hp, y= mpg), data = mtcars.c, color = "blue")  
   #选用不同的数据集,在上一层基础上叠加了mtcars.c的图层  #选用不同的数据集,在上一层基础上叠加了mtcars.c的图层)
 
+#尝试geom_point中aes的新参数shape、size、alpha等
 ggplot(data=mtcars,aes(col=factor(cyl)))+
   geom_point(aes(x = hp, y = mpg,shape=factor(gear)), data = mtcars)
 
