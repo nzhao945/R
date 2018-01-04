@@ -14,4 +14,3 @@ ggplot()+
   #选用向量数据
   geom_point(aes(x = hp, y= mpg), data = mtcars.c, color = "blue")  
   #选用不同的数据集,在上一层基础上叠加了mtcars.c的图层
-  #
