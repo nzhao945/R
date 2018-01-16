@@ -35,3 +35,4 @@ comb$Title[comb$Title == 'Ms'] <- 'Miss'
 comb$Title[comb$Title == 'Mme'] <- 'Mrs' 
 comb$Title[comb$Title %in% rare_title] <- 'Rare Title'
 
+
