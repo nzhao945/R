@@ -17,15 +17,16 @@ str(train)
 train <- train %>% mutate(Survived = factor(Survived),Pclass = factor(Pclass),
                           Embarked = factor(Embarked),Sex = factor(Sex))
 str(test)
-test <- test %>% mutate(Pclass = factor(Pclass),Embarked = factor(Embarked),Sex = factor(Sex))
+test <- test %>% mutate(Pclass = factor(Pclass),
+                        Embarked = factor(Embarked),Sex = factor(Sex))
+
+# 合并train和test,自动补全test中的Survived=NA
+comb <- dplyr::bind_rows(train,test)
+#增加Title列
+comb$Title <- gsub('(.*, )|(\\..*)', '', comb$Name)
 
 #缺失值可视化
 aggr(train, prop = FALSE, combined = TRUE, numbers = TRUE, sortVars = TRUE, sortCombs = TRUE)
-
-# 合并train和test,test中不存在的列Survived由参数fill=T生成NA
-comb <- rbind(train,test, fill = T)
-#增加Title列
-comb$Title <- gsub('(.*, )|(\\..*)', '', comb$Name)
 
 ###下面开始进行初步探索数据集###
 table(comb$Sex,comb$Title)
