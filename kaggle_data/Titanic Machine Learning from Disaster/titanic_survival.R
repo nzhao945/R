@@ -27,7 +27,7 @@ comb$Title <- gsub('(.*, )|(\\..*)', '', comb$Name)
 # 这里的(\\..*)子表达式不理解，所以又想出如下的方法
 # comb$Title <- sapply(comb$Name,function(x)strsplit(x,split = '[,.]')[[1]][2])
 
-# 缺失值可视化
+# 缺失值可视化，图中可以看到：cabin缺失最多(687)，其次是age(177),最后是emarked（2）
 aggr(train, prop = FALSE, combined = TRUE, numbers = TRUE, sortVars = TRUE, sortCombs = TRUE)
 
 ###下面开始进行初步探索数据集###
@@ -37,5 +37,15 @@ comb$Title[comb$Title == 'Mlle'] <- 'Miss'
 comb$Title[comb$Title == 'Ms'] <- 'Miss'
 comb$Title[comb$Title == 'Mme'] <- 'Mrs' 
 comb$Title[comb$Title %in% rare_title] <- 'Rare Title'
+comb$Title <- factor(comb$Title)
 
+### sibsp和parch的特征工程
+comb$Fsize <- comb$SibSp + comb$Parch + 1
+# Create a family variable 
+comb$Family <- paste(comb$Surname, comb$Fsize, sep='_')
+# 同样对Family size进行分类
+comb$FsizeD[comb$Fsize == 1] <- 'singleton'
+comb$FsizeD[comb$Fsize < 5 & comb$Fsize > 1] <- 'small'
+comb$FsizeD[comb$Fsize > 4] <- 'large'
 
+### 紧接着就是填补缺失值Cabin
