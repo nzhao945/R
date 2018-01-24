@@ -28,6 +28,7 @@ comb <- dplyr::bind_rows(train,test)
 # 缺失值可视化，图中可以看到：cabin缺失最多(687)，其次是age(177),最后是emarked（2）
 aggr(train, prop = FALSE, combined = TRUE, numbers = TRUE, sortVars = TRUE, sortCombs = TRUE)
 
+#############################挖掘有价值的变量###################################################
 # 增加Title列
 comb$Title <- gsub('(.*, )|(\\..*)', '', comb$Name) 
 # 这里的(\\..*)子表达式不理解，所以又想出如下的方法,fixed=F精确匹配字符，若=T则为正则
@@ -62,6 +63,46 @@ factor_vars <- c('PassengerId','Pclass','Sex','Embarked',
                  'Title','Surname','Family','FsizeD')
 comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 
-# Age可以用mice插补
+####################################缺失值填补#################################################
+# comb$Age可以用mice插补
 imp <- mice(comb[, !names(comb) %in% c('PassengerId','Name','Ticket','Cabin','Family','Surname','Survived')], method = 'rf', seed = 129)
 mice_result <- complete(mice_mod)
+comb$Age <- mice_result$Age
+
+### create a couple of new age-dependent variables: Child and Mother. 
+comb$Child[comb$Age < 18] <- 'Child'
+comb$Child[comb$Age >= 18] <- 'Adult'
+table(comb$Child, comb$Survived)
+comb$Mother <- 'Not Mother'
+comb$Mother[comb$Sex == 'female' & comb$Parch > 0 & comb$Age > 18 & comb$Title != 'Miss'] <- 'Mother'
+table(comb$Mother, comb$Survived)
+# 因子化
+comb$Child  <- factor(comb$Child)
+comb$Mother <- factor(comb$Mother)
+
+################开始预测前，先将所有基于comb进行的数据填补、类型转换等返回给train和test###########
+train <- comb[1:891,]
+test <- comb[892:1309,]
+rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + 
+                           Fare + Embarked + Title + FsizeD + Child + Mother, data = train)
+plot(rf_model, ylim=c(0,0.36))
+legend('topright', colnames(rf_model$err.rate), col=1:3, fill=1:3)
+# Get variable importance
+varImportance <- importance(rf_model) %>% data.frame(Variables = row.names(.), Importance = round(.[,'MeanDecreaseGini'],2))
+# Create a rank variable based on importance
+rankImportance <- varImportance %>%
+  mutate(Rank = paste0('#',dense_rank(desc(Importance))))
+# Use ggplot2 to visualize the relative importance of variables
+ggplot(rankImportance, aes(x = reorder(Variables, Importance), y = Importance, fill = Importance)) +
+  geom_bar(stat='identity') + 
+  geom_text(aes(x = Variables, y = 0.5,label = Rank),hjust=0, vjust=0.55, size = 4,colour = 'red') +
+  labs(x = 'Variables') +
+  coord_flip() +
+  theme_classic()
+# 最终结果预测，并导出
+solution <- predict(rf_model,test) %>% data.frame(PassengerID = test$PassengerId, Survived = .)
+fwrite(solution, row.names = FALSE,
+      file = 'G:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
+
+#############################################################################################
+
