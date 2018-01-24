@@ -104,5 +104,5 @@ solution <- predict(rf_model,test) %>% data.frame(PassengerID = test$PassengerId
 fwrite(solution, row.names = FALSE,
       file = 'G:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
 
-#############################################################################################
+#####################################The End#############################################
 
