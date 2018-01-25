@@ -29,9 +29,9 @@ comb <- dplyr::bind_rows(train,test)
 aggr(train, prop = FALSE, combined = TRUE, numbers = TRUE, sortVars = TRUE, sortCombs = TRUE)
 
 #############################挖掘有价值的变量###################################################
-# 增加Title列
+# 增加Title列，(\\..*)中的"\\'是R特有的，参考read.csv中的文件路径，所以子表达式的含义是字符‘.’+任意个字符
 comb$Title <- gsub('(.*, )|(\\..*)', '', comb$Name) 
-# 这里的(\\..*)子表达式不理解，所以又想出如下的方法,fixed=F精确匹配字符，若=T则为正则
+# 又想出如下的方法,fixed=T精确匹配字符，若=F则为正则
 # comb$Title <- sapply(comb$Name,function(x)strsplit(x,split = '[,.]',fixed = FALSE)[[1]][2])
 
 ###下面开始进行初步探索数据集###
