@@ -81,6 +81,7 @@ comb$Child  <- factor(comb$Child)
 comb$Mother <- factor(comb$Mother)
 
 ################开始预测前，先将所有基于comb进行的数据填补、类型转换等返回给train和test###########
+################开始randomforest预测前，先将所有基于comb进行的数据填补、类型转换等返回给train和test###########
 train <- comb[1:891,]
 test <- comb[892:1309,]
 rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + 
