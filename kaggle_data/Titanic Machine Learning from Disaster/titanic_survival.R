@@ -84,7 +84,7 @@ comb$Mother <- factor(comb$Mother)
 train <- comb[1:891,]
 test <- comb[892:1309,]
 rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + 
-                           Fare + Embarked + Title + FsizeD + Child + Mother, data = train)
+                           Fare + Embarked + Title + FsizeD + Child + Mother, data = train, importance = T)
 plot(rf_model, ylim=c(0,0.36))
 legend('topright', colnames(rf_model$err.rate), col=1:3, fill=1:3)
 # Get variable importance
