@@ -53,7 +53,7 @@ comb$FsizeD[comb$Fsize == 1] <- 'singleton'
 comb$FsizeD[comb$Fsize < 5 & comb$Fsize > 1] <- 'small'
 comb$FsizeD[comb$Fsize > 4] <- 'large'
 
-### 紧接着尝试填补缺失值，然而因为Cabin缺失值太多，只能暂时放弃
+################################缺失值填补，然而因为Cabin缺失值太多，只能暂时放弃#########################################
 # 填补Embarked、Fare
 comb$Embarked[c(62, 830)] <- 'C'
 comb$Fare[1044] <- median(comb[comb$Pclass == '3' & comb$Embarked == 'S', ]$Fare, na.rm = TRUE)
@@ -63,7 +63,6 @@ factor_vars <- c('PassengerId','Pclass','Sex','Embarked',
                  'Title','Surname','Family','FsizeD')
 comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 
-####################################缺失值填补#################################################
 # comb$Age可以用mice插补
 imp <- mice(comb[, !names(comb) %in% c('PassengerId','Name','Ticket','Cabin','Family','Surname','Survived')], method = 'rf', seed = 129)
 mice_result <- complete(mice_mod)
