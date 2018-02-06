@@ -5,6 +5,7 @@ library(mice)
 library(VIM)
 library(ggplot2)
 library(randomForest)
+library(party)
 
 # 导入训练集和测试集,发现部分空值不能正确读取为NA，故加入参数na.strings = c("NA","")
 train <- fread(header = T, stringsAsFactors = F,na.strings = c("NA","","N/A","null"),
@@ -82,7 +83,7 @@ comb$Mother <- factor(comb$Mother)
 ################开始randomforest预测前，先将所有基于comb进行的数据填补、类型转换等返回给train和test###########
 train <- comb[1:891,]
 test <- comb[892:1309,]
-rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +
+rf_model <- randomForest(Survived ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +
                         Title + FsizeD + Child + Mother, data = train, importance = T)
 plot(rf_model, ylim=c(0,0.36))
 legend('topright', colnames(rf_model$err.rate), col=1:3, fill=1:3)
@@ -103,5 +104,8 @@ solution <- predict(rf_model,test) %>% data.frame(PassengerID = test$PassengerId
 fwrite(solution, row.names = FALSE,
       file = 'G:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
 
-#####################################逻辑回归#############################################
-
+#####################################party::cforest,0.80382，rank1119#############################################
+set.seed(355)
+rf_modelV2 <- cforest(Survived ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +Title + FsizeD + Child + Mother,                              data = train, controls = cforest_unbiased(ntree = 1000, mtry = 3))
+solution_V2 <- predict(rf_modelV2,test, OOB = T, type = 'response') %>% data.frame(PassengerID = test$PassengerId, Survived = .)
+fwrite(solution_V2, row.names = FALSE, file = 'D:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
