@@ -53,7 +53,7 @@ comb$FsizeD[comb$Fsize == 1] <- 'singleton'
 comb$FsizeD[comb$Fsize < 5 & comb$Fsize > 1] <- 'small'
 comb$FsizeD[comb$Fsize > 4] <- 'large'
 
-### 紧接着尝试填补缺失值，然而因为Cabin缺失值太多，只能暂时放弃
+################################缺失值填补，然而因为Cabin缺失值太多，只能暂时放弃#########################################
 # 填补Embarked、Fare
 comb$Embarked[c(62, 830)] <- 'C'
 comb$Fare[1044] <- median(comb[comb$Pclass == '3' & comb$Embarked == 'S', ]$Fare, na.rm = TRUE)
@@ -63,7 +63,6 @@ factor_vars <- c('PassengerId','Pclass','Sex','Embarked',
                  'Title','Surname','Family','FsizeD')
 comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 
-####################################缺失值填补#################################################
 # comb$Age可以用mice插补
 imp <- mice(comb[, !names(comb) %in% c('PassengerId','Name','Ticket','Cabin','Family','Surname','Survived')], method = 'rf', seed = 129)
 mice_result <- complete(mice_mod)
@@ -83,7 +82,8 @@ comb$Mother <- factor(comb$Mother)
 ################开始randomforest预测前，先将所有基于comb进行的数据填补、类型转换等返回给train和test###########
 train <- comb[1:891,]
 test <- comb[892:1309,]
-rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +                            Title + FsizeD + Child + Mother, data = train, importance = T)
+rf_model <- randomForest(factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +
+                        Title + FsizeD + Child + Mother, data = train, importance = T)
 plot(rf_model, ylim=c(0,0.36))
 legend('topright', colnames(rf_model$err.rate), col=1:3, fill=1:3)
 # Get variable importance
