@@ -2,6 +2,7 @@
 library(data.table)
 library(dplyr)
 library(mice)
+library(rpart) #决策树包，此处用于预测Age缺失值
 library(VIM)
 library(ggplot2)
 library(randomForest)
@@ -106,6 +107,6 @@ fwrite(solution, row.names = FALSE,
 
 #####################################party::cforest,0.80382，rank1119#############################################
 set.seed(355)
-rf_modelV2 <- cforest(Survived ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +Title + FsizeD + Child + Mother,                              data = train, controls = cforest_unbiased(ntree = 1000, mtry = 3))
+rf_modelV2 <- cforest(Survived ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +Title + FsizeD + Child + Mother,data = train, controls = cforest_unbiased(ntree = 1000, mtry = 5))
 solution_V2 <- predict(rf_modelV2,test, OOB = T, type = 'response') %>% data.frame(PassengerID = test$PassengerId, Survived = .)
 fwrite(solution_V2, row.names = FALSE, file = 'D:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
