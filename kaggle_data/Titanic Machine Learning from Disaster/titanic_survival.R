@@ -6,7 +6,7 @@ library(rpart) #决策树包，此处用于预测Age缺失值
 library(VIM)
 library(ggplot2)
 library(randomForest)
-library(party)
+library(rpart)
 
 # 导入训练集和测试集,发现部分空值不能正确读取为NA，故加入参数na.strings = c("NA","")
 train <- fread(header = T, stringsAsFactors = F,na.strings = c("NA","","N/A","null"),
