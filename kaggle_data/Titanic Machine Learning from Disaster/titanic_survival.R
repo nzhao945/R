@@ -55,6 +55,12 @@ comb$FsizeD[comb$Fsize == 1] <- 'singleton'
 comb$FsizeD[comb$Fsize < 5 & comb$Fsize > 1] <- 'small'
 comb$FsizeD[comb$Fsize > 4] <- 'large'
 
+# 还剩下ticket变量未进行特征工程
+ticket.count <- aggregate(comb$Ticket, by=list(comb$Ticket),function(x) sum(!is.na(x)))
+# 接下来将所有乘客按照Ticket分为两组，一组是使用单独票号，另一组是与他人共享票号
+comb$TicketCount <- apply(comb,1,function(x) ticket.count[which(ticket.count[,1] == x['Ticket']),2]) %>% sapply(function(x) ifelse(x>1,'Share','Unique')) %>% factor()
+
+
 ################################缺失值填补，然而因为Cabin缺失值太多，只能暂时放弃#########################################
 # 填补Embarked、Fare
 comb$Embarked[c(62, 830)] <- 'C'
@@ -69,6 +75,9 @@ comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 imp <- mice(comb[, !names(comb) %in% c('PassengerId','Name','Ticket','Cabin','Family','Surname','Survived')], method = 'rf', seed = 129)
 mice_result <- complete(mice_mod)
 comb$Age <- mice_result$Age
+#也可以用rpart
+# Age_rpart <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked + Title + Fsize, data=comb[!is.na(comb$Age),], method='anova')
+# comb$Age[is.na(comb$Age)] <- predict(Age_rpart,comb[!is.na(comb$Age),])
 
 ### create a couple of new age-dependent variables: Child and Mother. 
 comb$Child[comb$Age < 18] <- 'Child'
@@ -105,8 +114,8 @@ solution <- predict(rf_model,test) %>% data.frame(PassengerID = test$PassengerId
 fwrite(solution, row.names = FALSE,
       file = 'G:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
 
-#####################################party::cforest,0.80382，rank1119#############################################
+########################party::cforest,0.80861，rank703,TOP 8%#############################
 set.seed(355)
-rf_modelV2 <- cforest(Survived ~ Pclass + Sex + Age + SibSp + Parch +Fare + Embarked +Title + FsizeD + Child + Mother,data = train, controls = cforest_unbiased(ntree = 1000, mtry = 5))
+rf_modelV2 <- cforest(Survived ~ Pclass + Sex + Age +Fare + Embarked +Title + FsizeD + TicketCount,data = train, controls = cforest_unbiased(ntree = 1000, mtry = 3))
 solution_V2 <- predict(rf_modelV2,test, OOB = T, type = 'response') %>% data.frame(PassengerID = test$PassengerId, Survived = .)
-fwrite(solution_V2, row.names = FALSE, file = 'D:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
+fwrite(solution_V2, row.names = FALSE, file = 'G:/R/kaggle_data/Titanic Machine Learning from Disaster/submission_titanic.csv')
