@@ -34,7 +34,7 @@ aggr(train, prop = FALSE, combined = TRUE, numbers = TRUE, sortVars = TRUE, sort
 # 增加Title列，(\\..*)中的"\\'是R特有的，参考read.csv中的文件路径，所以子表达式的含义是字符‘.’+任意个字符
 comb$Title <- gsub('(.*, )|(\\..*)', '', comb$Name) 
 # 又想出如下的方法,fixed=T精确匹配字符，若=F则为正则
-# comb$Title <- sapply(comb$Name,function(x)strsplit(x,split = '[,.]',fixed = FALSE)[[1]][2])
+# comb$Title <- sapply(comb$Name,function(x)strsplit(x,split = '[,. ]',fixed = FALSE)[[1]][3])
 
 ###下面开始进行初步探索数据集###
 table(comb$Sex,comb$Title)
