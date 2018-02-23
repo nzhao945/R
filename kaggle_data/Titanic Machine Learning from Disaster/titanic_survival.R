@@ -75,7 +75,7 @@ comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 imp <- mice(comb[, !names(comb) %in% c('PassengerId','Name','Ticket','Cabin','Family','Surname','Survived')], method = 'rf', seed = 129)
 mice_result <- complete(mice_mod)
 comb$Age <- mice_result$Age
-#也可以用rpart
+# rf_modelV2基于rpart进行插补Age
 # Age_rpart <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked + Title + Fsize, data=comb[!is.na(comb$Age),], method='anova')
 # comb$Age[is.na(comb$Age)] <- predict(Age_rpart,comb[!is.na(comb$Age),])
 
