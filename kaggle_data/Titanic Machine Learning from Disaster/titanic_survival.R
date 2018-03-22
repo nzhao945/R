@@ -22,7 +22,7 @@ str(test)
 test <- test %>% mutate(Pclass = factor(Pclass),
                         Embarked = factor(Embarked),Sex = factor(Sex))
 # 更简洁的方式是用lapply函数
-# factor_vars <- c('PassengerId','Pclass','Sex','Embarked','Title','Surname','Family','FsizeD')
+# factor_vars <- c('Pclass','Sex','Embarked','Title','Surname','Family','FsizeD')
 # comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 # 合并train和test,自动补全test中的Survived=NA
 comb <- dplyr::bind_rows(train,test)
