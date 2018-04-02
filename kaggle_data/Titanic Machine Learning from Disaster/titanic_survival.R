@@ -77,7 +77,7 @@ comb[factor_vars] <- lapply(comb[factor_vars], function(x) as.factor(x))
 # comb$Age <- mice_result$Age
 # rf_modelV2基于rpart进行插补Age
 Age_rpart <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked + Title + Fsize, data=comb[!is.na(comb$Age),], method='anova')
-comb$Age[is.na(comb$Age)] <- predict(Age_rpart,comb[!is.na(comb$Age),])
+comb$Age[is.na(comb$Age)] <- predict(Age_rpart,comb[is.na(comb$Age),])
 
 ### create a couple of new age-dependent variables: Child and Mother. 
 comb$Child[comb$Age < 18] <- 'Child'
